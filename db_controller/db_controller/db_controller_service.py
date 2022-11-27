@@ -127,9 +127,7 @@ class DbControllerService(db_controller_pb2_grpc.PostsAnalyserDbControllerServic
 
         try:
             self._db_connection.create_post(author, title, content)
-            self.logger.info(
-                f'Post "{title}" created successfully by "{author}"'
-            )
+            self.logger.info(f'Post "{title}" created successfully by "{author}"')
             self.logger.debug(f"Post content:\n{content}")
 
         except DbConnectionError as e:
@@ -155,12 +153,8 @@ class DbControllerService(db_controller_pb2_grpc.PostsAnalyserDbControllerServic
         classification = request.classification
 
         try:
-            self._db_connection.modify_post(
-                id, title, content, classification
-            )
-            self.logger.info(
-                f'Post with "{id}" modified successfully."'
-            )
+            self._db_connection.modify_post(id, title, content, classification)
+            self.logger.info(f'Post with "{id}" modified successfully."')
 
         except DbConnectionError as e:
             self.logger.warning(e.message)
@@ -209,13 +203,9 @@ class DbControllerService(db_controller_pb2_grpc.PostsAnalyserDbControllerServic
     def GetPostsEntries(self, request, context):
         try:
             posts = self._db_connection.get_posts()
-            posts_message = [
-                self._parse_post_entry_as_message(post) for post in posts
-            ]
+            posts_message = [self._parse_post_entry_as_message(post) for post in posts]
             self.logger.debug(f"{len(posts_message)} posts loaded successfully.")
-            return db_controller_pb2.GetPostsEntriesResponse(
-                post_entries=posts_message
-            )
+            return db_controller_pb2.GetPostsEntriesResponse(post_entries=posts_message)
 
         # possibly, remove DbConnectionError handling, since now it does not occur
         except DbConnectionError as e:
@@ -240,17 +230,11 @@ class DbControllerService(db_controller_pb2_grpc.PostsAnalyserDbControllerServic
             db_controller_pb2.PostEntry(
                 id=post_db_entry.id,
                 title=post_db_entry.author,
-                created_at=post_db_entry.created_at.replace(
-                    microsecond=0
-                ).isoformat(),
-                modified_at=post_db_entry.modified_at.replace(
-                    microsecond=0
-                ).isoformat()
+                created_at=post_db_entry.created_at.replace(microsecond=0).isoformat(),
+                modified_at=post_db_entry.modified_at.replace(microsecond=0).isoformat()
                 if post_db_entry.modified_at is not None
                 else None,
-                tagged_at=post_db_entry.tagged_at.replace(
-                    microsecond=0
-                ).isoformat()
+                tagged_at=post_db_entry.tagged_at.replace(microsecond=0).isoformat()
                 if post_db_entry.tagged_at is not None
                 else None,
                 classification=post_db_entry.classification,

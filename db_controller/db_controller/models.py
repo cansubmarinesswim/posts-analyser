@@ -11,6 +11,7 @@ from sqlalchemy.sql import func
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = "app_user"
     username = Column(String, primary_key=True)

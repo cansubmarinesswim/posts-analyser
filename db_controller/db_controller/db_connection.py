@@ -22,17 +22,20 @@ class UserDoesNotExist(DbConnectionError):
             message = f'DB entry for user "{username}" does not exist.'
         super().__init__(StatusCode.NOT_FOUND, message)
 
+
 class WrongCredentials(DbConnectionError):
     def __init__(self, username, *, message=None):
         if not message:
             message = f'Invalid password provided for user "{username}".'
         super().__init__(StatusCode.UNAUTHENTICATED, message)
 
+
 class PostDoesNotExist(DbConnectionError):
     def __init__(self, post_id, *, message=None):
         if not message:
-            message = f'DB entry for post with id {post_id} does not exist.'
+            message = f"DB entry for post with id {post_id} does not exist."
         super().__init__(StatusCode.NOT_FOUND, message)
+
 
 class InvalidJsonString(DbConnectionError):
     def __init__(self, json_string, *, message=None):
@@ -99,11 +102,7 @@ class DbConnection:
             return post
 
     def _find_post(self, id, session_context):
-        post = (
-            session_context.query(Post)
-            .filter_by(id = id)
-            .first()
-        )
+        post = session_context.query(Post).filter_by(id=id).first()
         if post is None:
             raise PostDoesNotExist(id)
         return post
@@ -113,12 +112,12 @@ class DbConnection:
 
             post = self._find_post(id, session)
 
-            if title and title!= post.title:
+            if title and title != post.title:
                 post.title = title
-            if content and content!= post.content:
+            if content and content != post.content:
                 post.content = content
                 post.tagged_at = None
-                post.classification=None
+                post.classification = None
             if classification and classification != post.classification:
                 self._validate_json(classification)
                 # self.tagged_at todo

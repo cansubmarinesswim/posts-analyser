@@ -46,9 +46,7 @@ class BuildPackageProtos(Command):
             ] + [str(temp_proto_dir.relative_to(package_root) / main_proto_file.name)]
 
             if protoc.main(main_proto_command) != 0:
-                raise Exception(
-                    "Problem with building db-controller gRPC modules"
-                )
+                raise Exception("Problem with building db-controller gRPC modules")
 
         except Exception as e:
             print(e)

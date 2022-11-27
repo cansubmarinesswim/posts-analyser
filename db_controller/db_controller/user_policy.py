@@ -36,13 +36,11 @@ class UserPolicy:
     def _validate_username(self, user_name):
         if len(user_name) < self._user_name_min_len:
             raise PolicyNotMet(
-                "User name must have at least %s characters."
-                % self._user_name_min_len
+                "User name must have at least %s characters." % self._user_name_min_len
             )
         if len(user_name) > self._user_name_max_len:
             raise PolicyNotMet(
-                "User name must have at most %s characters."
-                % self._user_name_max_len
+                "User name must have at most %s characters." % self._user_name_max_len
             )
         if re.match(self._user_name_regex_rules, user_name) is None:
             raise PolicyNotMet(

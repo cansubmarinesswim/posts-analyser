@@ -22,7 +22,9 @@ class Logger:
         self._stream_handler.setFormatter(self._formatter)
 
         self._file_handler = TimedRotatingFileHandler(
-            filename=(file_log_dir + "/posts_analyser_service_database_connector_log.txt"),
+            filename=(
+                file_log_dir + "/posts_analyser_service_database_connector_log.txt"
+            ),
             when="midnight",
         )
         self._file_handler.setLevel(file_log_level)
