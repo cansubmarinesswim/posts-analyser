@@ -1,25 +1,28 @@
 import requests
 
+
 class MlConnectorError(Exception):
-    def __init__(self, message):            
+    def __init__(self, message):
         super().__init__(message)
         self.status_code = 400
+        self.message = message
+
 
 class MlConnector:
-    def __init__(self, service_host: str, service_port:str):
-        self.service_host = service_host
-        self.service_port = service_port
+    def __init__(self, host: str, port: str):
+        self._host = host
+        self._port = port
 
     def classify_post(self, text: str):
         try:
+            print(text)
             response = requests.post(
-                f"http://{self.service_host}:{self.service_port}/classify",
-                data={"text": text}
+                f"http://{self._host}:{self._port}/classify", data={"text": text}
             )
-            return self._parse_classification_response(response) 
+            return self._parse_classification_response(response)
         except Exception as e:
             raise MlConnectorError(e)
-    
+
     def _parse_classification_response(self, response):
         json_response = response.json()
         formatted_json_response = {

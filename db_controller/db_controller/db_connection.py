@@ -77,14 +77,18 @@ class DbConnection:
     def _is_password_correct(self, password: str, password_hash: str):
         return bcrypt.checkpw(password.encode(), password_hash.encode())
 
-    def create_post(self, author: str, title: str, content: str):
+    def create_post(self, author: str, title: str, content: str, classification: str):
         with self._Session() as session:
             user = self._find_user(author, session)
+
+            if classification:
+                self._validate_json(classification)
 
             post = Post(
                 title=title,
                 author=user.username,
                 content=content,
+                classification=classification,
             )
 
             session.add(post)
@@ -125,11 +129,11 @@ class DbConnection:
 
             session.commit()
 
-    # def remove_post(self, id):
-    #     with self._Session() as session:
-    #         post = self._find_post(id, session)
-    #         session.delete(post)
-    #         session.commit()
+    def remove_post(self, id):
+        with self._Session() as session:
+            post = self._find_post(id, session)
+            session.delete(post)
+            session.commit()
 
     def get_posts(self):
         with self._Session() as session:

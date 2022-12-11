@@ -30,11 +30,11 @@ class BuildWithModelComponents(Command):
 
         model_name = model_name = f"cardiffnlp/twitter-roberta-base-sentiment"
         labels_source = f"https://raw.githubusercontent.com/cardiffnlp/tweeteval/main/datasets/sentiment/mapping.txt"
-        
+
         model_dir = project_root / "model"
 
         tokenizer_file = model_dir / "tokenizer"
-        model_file = model_dir /  "model"
+        model_file = model_dir / "model"
         labels_file = model_dir / "labels.txt"
 
         tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -44,9 +44,9 @@ class BuildWithModelComponents(Command):
         model.save_pretrained(model_file)
 
         label_response = requests.get(labels_source)
-        with open(labels_file, 'wb') as f:
+        with open(labels_file, "wb") as f:
             f.write(label_response.content)
-        
+
         with open("src/model_dir.py", "w") as f:
             f.write(f'model_dir = "{model_dir}"\n')
 
@@ -113,8 +113,8 @@ setup(
     description="ML model server for sentiment analysis",
     author="Maciek Stopa",
     url="https://github.com/cansubmarinesswim/posts-analyser",
-    packages=['posts_sentiment_analyser'],
-    package_dir={'posts_sentiment_analyser':'src'},
+    packages=["posts_sentiment_analyser"],
+    package_dir={"posts_sentiment_analyser": "src"},
     include_package_data=True,
     install_requires=[
         "flask",
@@ -123,7 +123,7 @@ setup(
         "scipy",
         "torch",
         "transformers",
-        "waitress"
+        "waitress",
     ],
     setup_requires=[
         "requests",
@@ -136,5 +136,5 @@ setup(
         "develop": CustomDevelop,
         "egg_info": CustomEggInfo,
         "install": CustomInstall,
-    }
+    },
 )

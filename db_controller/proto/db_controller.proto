@@ -9,7 +9,7 @@ service PostsAnalyserDbController {
 
   rpc AddPostEntry(AddPostEntryRequest) returns (AddPostEntryResponse);
 	rpc ModifyPostEntry(ModifyPostEntryRequest) returns (ModifyPostEntryResponse);
-	// rpc RemovePostEntry(RemovePostEntryRequest) returns (RemovePostEntryResponse);
+	rpc RemovePostEntry(RemovePostEntryRequest) returns (RemovePostEntryResponse);
 	rpc GetPostEntry(GetPostEntryRequest) returns (GetPostEntryResponse);
 
 	rpc GetPostsEntries(GetPostsEntriesRequest) returns (GetPostsEntriesResponse);
@@ -39,6 +39,7 @@ message AddPostEntryRequest {
   string title = 1;
   string author = 2;
   string content = 3;
+  string classification = 4;
 }
 
 message AddPostEntryResponse {}
@@ -52,11 +53,11 @@ message ModifyPostEntryRequest {
 
 message ModifyPostEntryResponse {}
 
-// message RemovePostEntryRequest {
-//  int32 id = 1;
-// }
+message RemovePostEntryRequest {
+ int32 id = 1;
+}
 
-// message RemovePostEntryResponse {}
+message RemovePostEntryResponse {}
 
 message GetPostEntryRequest {
   int32 id = 1;

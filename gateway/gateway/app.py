@@ -1,14 +1,15 @@
 from flask import Flask, jsonify, request
 from healthcheck import HealthCheck
 from gateway.ml_connector import MlConnector, MlConnectorError
-from gateway.db_controller_connector import DbConnector
+from gateway.db_controller_connector import DbConnector, DbConnectorError
 
 app = Flask(__name__)
 
-ml_connector = MlConnector(service_host="0.0.0.0", service_port="60053")
-db_connector = DbConnector()
+ml_connector = MlConnector(host="0.0.0.0", port="60053")
+db_connector = DbConnector(host="0.0.0.0", port="60052")
 
 health = HealthCheck()
+
 
 def classify_works():
     try:
@@ -16,54 +17,86 @@ def classify_works():
     except:
         return False, "service is broken"
 
+
 health.add_check(classify_works)
 
-@app.route('/healthcheck', methods=['GET', 'POST'])
+
+@app.route("/healthcheck", methods=["GET", "POST"])
 def healthcheck():
     return health.run()
 
-@app.route('/post/create', methods=['POST'])
+
+@app.route("/post/create", methods=["POST"])
 def create_post():
     try:
-        post_content =request.form.get("post")
-        classification = ml_connector.classify_post(post_content)
-        # zapisz w bazie
-        # Dostań ID postu nowego w bazie
-        id = 10
+        username = request.form.get("username")
+        post_title = request.form.get("title")
+        post_content = request.form.get("post")
 
-        return jsonify({"post_id": id, "classification": classification}), 200
+        classification = ml_connector.classify_post(post_content)
+        db_connector.add_post(
+            author=username,
+            title=post_title,
+            content=post_content,
+            classification=classification,
+        )
+
+        return jsonify(success=True), 200
     except MlConnectorError as e:
-        print("MlConnectorError: ", e)
+        print("MlConnectorError: ", e.message)
+        return jsonify(success=False), e.status_code
+    except DbConnectorError as e:
+        print("DbConnectorError: ", e.message)
         return jsonify(success=False), e.status_code
     except:
         return jsonify(success=False), 400
 
-@app.route('/post/<id>', methods=['GET'])
+
+@app.route("/post/add_user", methods=["POST"])
+def add_user():
+    try:
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        db_connector.add_user(
+            username=username,
+            password=password,
+        )
+
+        return jsonify(success=True), 200
+    except DbConnectorError as e:
+        print("DbConnectorError: ", e.message)
+        return jsonify(success=False), e.status_code
+    except:
+        return jsonify(success=False), 400
+
+
+@app.route("/post/<id>", methods=["GET"])
 def remove_post(id):
     try:
         # Spytaj baze o usuniecie
-        # Dostan info o usunieciu
-        out = {"post_id": id}
-        return jsonify(out), 200
+        db_connector.remove_post(int(id))
+        return jsonify(success=True), 200
+    except DbConnectorError as e:
+        print("DbConnectorError: ", e.message)
+        return jsonify(success=False), e.status_code
     except:
         return jsonify("Failed"), 400
 
-@app.route('/posts', methods=['GET'])
+
+@app.route("/posts", methods=["GET"])
 def read_posts():
-    try:
-        # Spytaj baze o posty
-        # sformatuj je do zakldanego formtu json
-        out = {
-            "posts": [
-                {"id": 1},
-                {"id": 2}
-            ]
-        }
-        return jsonify(out)
-    except:
-        return jsonify("Failed"), 400
+    # try:
+    # Spytaj baze o posty
+    posts = db_connector.get_posts()
+
+    return jsonify(posts), 200
+    # except:
+    #     return jsonify("Failed"), 400
+
 
 def create_app():
     return app
+
 
 create_app()

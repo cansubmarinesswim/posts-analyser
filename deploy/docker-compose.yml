@@ -38,8 +38,9 @@ services:
       - PASSWD_SPECIAL
       - FILE_LOG_DIR
 
+    ## Temporary for development reasons
     ports:
-      - ${DB_CONTROLLER_SERVICE_PORT:?err}:60052
+      - ${DB_CONTROLLER_SERVICE_PORT:?err}:${DB_CONTROLLER_SERVICE_PORT}
     depends_on:
       db:
         condition: service_healthy

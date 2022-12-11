@@ -124,9 +124,10 @@ class DbControllerService(db_controller_pb2_grpc.PostsAnalyserDbControllerServic
         author = request.author
         title = request.title
         content = request.content
+        classification = request.classification
 
         try:
-            self._db_connection.create_post(author, title, content)
+            self._db_connection.create_post(author, title, content, classification)
             self.logger.info(f'Post "{title}" created successfully by "{author}"')
             self.logger.debug(f"Post content:\n{content}")
 
@@ -171,6 +172,29 @@ class DbControllerService(db_controller_pb2_grpc.PostsAnalyserDbControllerServic
             )
             context.abort_with_status(rpc_status.to_status(rich_status))
         return db_controller_pb2.ModifyPostEntryResponse()
+
+    def RemovePostEntry(self, request, context):
+        id = request.id
+
+        try:
+            self._db_connection.remove_post(id)
+            self.logger.info(f'Post with "{id}" removed successfully."')
+
+        except DbConnectionError as e:
+            self.logger.warning(e.message)
+            rich_status = self._create_rich_error_status(
+                e.message,
+                e.grpc_error,
+            )
+            context.abort_with_status(rpc_status.to_status(rich_status))
+        except Exception as e:
+            self.logger.error(e)
+            rich_status = self._create_rich_error_status(
+                "Unknown Error",
+                StatusCode.UNKNOWN,
+            )
+            context.abort_with_status(rpc_status.to_status(rich_status))
+        return db_controller_pb2.RemovePostEntryResponse()
 
     def GetPostEntry(self, request, context):
         id = request.id
@@ -229,7 +253,9 @@ class DbControllerService(db_controller_pb2_grpc.PostsAnalyserDbControllerServic
         return (
             db_controller_pb2.PostEntry(
                 id=post_db_entry.id,
-                title=post_db_entry.author,
+                title=post_db_entry.title,
+                author=post_db_entry.author,
+                content=post_db_entry.content,
                 created_at=post_db_entry.created_at.replace(microsecond=0).isoformat(),
                 modified_at=post_db_entry.modified_at.replace(microsecond=0).isoformat()
                 if post_db_entry.modified_at is not None
