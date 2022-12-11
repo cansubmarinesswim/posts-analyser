@@ -144,6 +144,6 @@ setup(
         "egg_info": CustomEggInfo,
         "install": CustomInstall,
     },
-    long_description=(project_root / "README.md").read_text(),
+    long_description=(package_root / "README.md").read_text(),
     long_description_content_type="text/markdown",
 )

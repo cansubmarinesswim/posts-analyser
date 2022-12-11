@@ -1,11 +1,11 @@
 import requests
 
-response = requests.get(f"http://127.0.0.1:5000/posts")
+response = requests.get(f"http://0.0.0.0:60051/posts")
 print(response.text)
 
 
 response = requests.post(
-    f"http://127.0.0.1:5000/post/add_user",
+    f"http://127.0.0.1:60051/post/add_user",
     data={
         "username": "user1",
         "password": "User123!"
@@ -13,7 +13,7 @@ response = requests.post(
 )
 
 response = requests.post(
-    f"http://127.0.0.1:5000/post/create",
+    f"http://127.0.0.1:60051/post/create",
     data={
         "username": "user1",
         "title": "tytul",
@@ -23,7 +23,7 @@ response = requests.post(
 print(response.text, response.status_code)
 
 response = requests.post(
-    f"http://127.0.0.1:5000/post/create",
+    f"http://127.0.0.1:60051/post/create",
     data={
         "username": "user1",
         "title": "tytul2",
@@ -33,11 +33,11 @@ response = requests.post(
 print(response.text, response.status_code)
 
 
-response = requests.get(f"http://127.0.0.1:5000/posts")
+response = requests.get(f"http://127.0.0.1:60051/posts")
 print(response.text)
 
 
 response = requests.get(
-    f"http://127.0.0.1:5000/post/1"
+    f"http://127.0.0.1:60051/post/1"
 )
 print(response.text, response.status_code)

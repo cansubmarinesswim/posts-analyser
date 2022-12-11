@@ -5,8 +5,8 @@ from gateway.db_controller_connector import DbConnector, DbConnectorError
 
 app = Flask(__name__)
 
-ml_connector = MlConnector(host="0.0.0.0", port="60053")
-db_connector = DbConnector(host="0.0.0.0", port="60052")
+ml_connector = MlConnector(host="ml", port="60053")
+db_connector = DbConnector(host="db_controller_service", port="60052")
 
 health = HealthCheck()
 
