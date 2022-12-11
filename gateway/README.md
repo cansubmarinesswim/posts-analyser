@@ -1,0 +1,1 @@
+To build docker, set the context in the repository root, not in `gateway` folder.
