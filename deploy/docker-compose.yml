@@ -72,6 +72,9 @@ services:
     environment:
       - ML_SERVICE_HOST
       - ML_SERVICE_PORT
+    ## Temporary for development reasons
+    ports:
+      - ${ML_SERVICE_PORT}:${ML_SERVICE_PORT}
 
 volumes:
   posts_analyser_db_volume:

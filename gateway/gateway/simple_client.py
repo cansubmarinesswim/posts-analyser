@@ -15,7 +15,7 @@ print(response.status_code)
 response = requests.post(
     f"http://127.0.0.1:5000/post/create",
     data={
-        "post": "blabla"
+        "post": "Amazing performance"
     }
 )
 print(response.text, response.status_code)
