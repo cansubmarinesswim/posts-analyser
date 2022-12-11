@@ -1,0 +1,7 @@
+*
+!./version.py
+!./setup.py
+!./README.md
+!./requirements.txt
+!src
+src/model_dir.py

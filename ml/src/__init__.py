@@ -1,0 +1,1 @@
+from posts_sentiment_analyser.app import create_app
