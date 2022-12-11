@@ -1,0 +1,5 @@
+node_modules
+backend_mockup
+build
+.dockerignore
+Dockerfile
