@@ -120,10 +120,37 @@ export default function UserPage() {
     if (res.error) {
       setError(res.error.name);
     }
-    setPostsList(res.rows);
+
+    let posts = [];
+    Object.keys(res).forEach(key => {
+      posts.push({
+        id: key,
+        text: res[key].content,
+        sentiment: parseSentiment(res[key].classification)
+      });
+    })
+    setPostsList(posts);
   };
 
-  fetchPosts();
+  const parseSentiment = (classification) => {
+    let sentiment;
+    let score = 0;
+
+    classification = JSON.parse(classification);
+
+    Object.keys(classification).forEach(key => {
+      if (parseFloat(classification[key]) > score) {
+        score = parseFloat(classification[key]);
+        sentiment = key;
+      }
+    });
+    
+    return sentiment;
+  };
+
+  React.useEffect(() => {
+    fetchPosts();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -131,15 +158,8 @@ export default function UserPage() {
     if (! newPost ) {
       return;
     }
-
-    const data = new FormData();
-
     try {
-      data.append('text', newPost);
-      data.append('created_at', `${new Date().toISOString()}`);
-      data.append('sentiment', 'negative')
-
-      const posted = await createPost(data);
+      const posted = await createPost(newPost);
 
       if (posted.error) {
         setError(posted.error);
