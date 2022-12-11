@@ -50,6 +50,29 @@ services:
     volumes:
       - ./log:${FILE_LOG_DIR:?err}
 
+  ml:
+    image: ${ML_SERVICE_CONTAINER_IMAGE}
+    container_name: ${ML_SERVICE_CONTAINER_NAME}
+    healthcheck:
+      test: [ "CMD", "curl", "http://${ML_SERVICE_HOST}:${ML_SERVICE_PORT}/healthcheck" ]
+      timeout: 20s
+      interval: 60s
+      retries: 5
+      start_period: 20s
+    env_file:
+      - microservices_defaults/ml.env
+    entrypoint: [
+      "waitress-serve",
+      "--host",
+      "${ML_SERVICE_HOST}",
+      "--port",
+      "${ML_SERVICE_PORT}",
+      "--call",
+      "posts_sentiment_analyser:create_app"]
+    environment:
+      - ML_SERVICE_HOST
+      - ML_SERVICE_PORT
+
 volumes:
   posts_analyser_db_volume:
     labels:
