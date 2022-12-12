@@ -25,12 +25,12 @@ def classify_works():
 health.add_check(classify_works)
 
 
-@app.route("/healthcheck", methods=["GET", "POST"])
+@app.route("/api/healthcheck", methods=["GET", "POST"])
 def healthcheck():
     return health.run()
 
 
-@app.route("/post/create", methods=["POST"])
+@app.route("/api/post/create", methods=["POST"])
 def create_post():
     try:
         username = request.form.get("username")
@@ -56,7 +56,7 @@ def create_post():
         return jsonify(success=False), 400
 
 
-@app.route("/post/add_user", methods=["POST"])
+@app.route("/api/post/add_user", methods=["POST"])
 def add_user():
     try:
         username = request.form.get("username")
@@ -75,7 +75,7 @@ def add_user():
         return jsonify(success=False), 400
 
 
-@app.route("/post/<id>", methods=["GET"])
+@app.route("/api/post/<id>", methods=["GET"])
 def remove_post(id):
     try:
         db_connector.remove_post(int(id))
@@ -87,7 +87,7 @@ def remove_post(id):
         return jsonify("Failed"), 400
 
 
-@app.route("/posts", methods=["GET"])
+@app.route("/api/posts", methods=["GET"])
 def read_posts():
     try:
         posts = db_connector.get_posts()

@@ -6,7 +6,7 @@ export async function createPost(post) {
   data.append('title', "title");
 
   try {
-    const res = await fetch('/post/create', {
+    const res = await fetch('/api/post/create', {
       method: 'POST',
       body: data,
     });
@@ -18,7 +18,7 @@ export async function createPost(post) {
   
 export async function getPosts() {
   try {
-    let res = await fetch(`/posts`);
+    let res = await fetch(`/api/posts`);
     res = await res.text();
     res = JSON.parse(res);
     return res;
@@ -29,7 +29,7 @@ export async function getPosts() {
   
 export async function removePost(id) {
   try {
-    const res = await fetch(`/post/${id}`, {
+    const res = await fetch(`/api/post/${id}`, {
       method: 'DELETE',
     });
     return res;

@@ -14,7 +14,7 @@ COPY . ./
 RUN npm run build
 
 
-FROM nginx:stable-alpine
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
+FROM nginx:1.17.10
+COPY --from=build /app/build /etc/nginx/html
+COPY ./deploy/nginx.conf /etc/nginx/nginx.conf
 CMD ["nginx", "-g", "daemon off;"]

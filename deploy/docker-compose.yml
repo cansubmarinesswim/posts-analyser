@@ -4,6 +4,8 @@ services:
   frontend:
     image: ${FRONTEND_CONTAINER_IMAGE}
     container_name: ${FRONTEND_CONTAINER_NAME}
+    depends_on:
+      - gateway
     restart: always
     env_file:
       - microservices_defaults/frontend.env
