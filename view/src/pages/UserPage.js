@@ -172,7 +172,7 @@ export default function UserPage() {
 
   const handleDelete = async () => {
     try {
-      removePost(openId);
+      await removePost(openId);
       fetchPosts();
     } catch (err) {
       setError(err);
@@ -185,8 +185,8 @@ export default function UserPage() {
       selected.forEach((id) => {
         removePost(id);
       });
+      await setSelected([]);
       fetchPosts();
-      setSelected([]);
     } catch (err) {
       setError(err);
     }

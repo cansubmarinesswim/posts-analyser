@@ -75,7 +75,7 @@ def add_user():
         return jsonify(success=False), 400
 
 
-@app.route("/api/post/<id>", methods=["GET"])
+@app.route("/api/post/<id>", methods=["DELETE"])
 def remove_post(id):
     try:
         db_connector.remove_post(int(id))
