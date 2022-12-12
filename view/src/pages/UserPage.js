@@ -126,26 +126,10 @@ export default function UserPage() {
       posts.push({
         id: key,
         text: res[key].content,
-        sentiment: parseSentiment(res[key].classification)
+        sentiment: res[key].classification
       });
     })
     setPostsList(posts);
-  };
-
-  const parseSentiment = (classification) => {
-    let sentiment;
-    let score = 0;
-
-    classification = JSON.parse(classification);
-
-    Object.keys(classification).forEach(key => {
-      if (parseFloat(classification[key]) > score) {
-        score = parseFloat(classification[key]);
-        sentiment = key;
-      }
-    });
-    
-    return sentiment;
   };
 
   React.useEffect(() => {
