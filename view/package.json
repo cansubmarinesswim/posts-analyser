@@ -80,5 +80,5 @@
   "overrides": {
     "@svgr/webpack": "^6.5.0"
   },
-  "proxy": "http://localhost:60051"
+  "proxy": "http://gateway:60051"
 }

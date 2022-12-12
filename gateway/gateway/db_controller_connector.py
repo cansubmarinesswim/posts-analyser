@@ -118,12 +118,13 @@ class DbConnector:
     def _parse_post_entries_to_dict(self, response):
         response_dict = {}
         for post in response.post_entries:
+            classification_dict = json.loads(post.classification)
             response_dict[post.id] = {
                 "title": post.title,
                 "author": post.author,
                 "content": post.content,
                 "created_at": post.created_at,
-                "classification": post.classification,
+                "classification": max(classification_dict, key = lambda key: classification_dict[key]),
             }
 
         return response_dict

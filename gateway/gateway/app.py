@@ -8,6 +8,10 @@ app = Flask(__name__)
 ml_connector = MlConnector(host="ml", port="60053")
 db_connector = DbConnector(host="db_controller_service", port="60052")
 
+# ml_connector = MlConnector(host="0.0.0.0", port="60053")
+# db_connector = DbConnector(host="0.0.0.0", port="60052")
+
+
 health = HealthCheck()
 
 
@@ -74,7 +78,6 @@ def add_user():
 @app.route("/post/<id>", methods=["GET"])
 def remove_post(id):
     try:
-        # Spytaj baze o usuniecie
         db_connector.remove_post(int(id))
         return jsonify(success=True), 200
     except DbConnectorError as e:
@@ -86,13 +89,12 @@ def remove_post(id):
 
 @app.route("/posts", methods=["GET"])
 def read_posts():
-    # try:
-    # Spytaj baze o posty
-    posts = db_connector.get_posts()
+    try:
+        posts = db_connector.get_posts()
 
-    return jsonify(posts), 200
-    # except:
-    #     return jsonify("Failed"), 400
+        return jsonify(posts), 200
+    except:
+        return jsonify("Failed"), 400
 
 
 def create_app():

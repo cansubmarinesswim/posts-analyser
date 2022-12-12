@@ -15,7 +15,6 @@ class MlConnector:
 
     def classify_post(self, text: str):
         try:
-            print(text)
             response = requests.post(
                 f"http://{self._host}:{self._port}/classify", data={"text": text}
             )
@@ -26,8 +25,8 @@ class MlConnector:
     def _parse_classification_response(self, response):
         json_response = response.json()
         formatted_json_response = {
-            "positive": json_response[0][1],
-            "neutral": json_response[1][1],
-            "negative": json_response[2][1],
+            json_response[0][0]: json_response[0][1],
+            json_response[1][0]: json_response[1][1],
+            json_response[2][0]: json_response[2][1],
         }
         return formatted_json_response

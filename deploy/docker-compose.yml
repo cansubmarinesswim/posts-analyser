@@ -1,6 +1,17 @@
 version: '3'
 
 services:
+  frontend:
+    image: ${FRONTEND_CONTAINER_IMAGE}
+    container_name: ${FRONTEND_CONTAINER_NAME}
+    restart: always
+    env_file:
+      - microservices_defaults/frontend.env
+    environment:
+      - PLACEHOLDER
+    ports:
+      - ${FRONTEND_PORT}:80
+
   gateway:
     image: ${GATEWAY_SERVICE_CONTAINER_IMAGE}
     container_name: ${GATEWAY_SERVICE_CONTAINER_NAME}
@@ -8,7 +19,7 @@ services:
     env_file:
       - microservices_defaults/gateway.env
     environment:
-      - DUPA
+      - PLACEHOLDER
     command: >
       flask 
         --app gateway/app.py
@@ -16,10 +27,8 @@ services:
         run
         --host=0.0.0.0
         --port="${GATEWAY_SERVICE_PORT}"
-
     ports:
       - ${GATEWAY_SERVICE_PORT:?err}:${GATEWAY_SERVICE_PORT}
-
 
   db:
     image: ${DB_CONTAINER_IMAGE}
