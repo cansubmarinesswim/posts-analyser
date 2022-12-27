@@ -1,6 +1,37 @@
 version: '3'
 
 services:
+  frontend:
+    image: ${FRONTEND_CONTAINER_IMAGE}
+    container_name: ${FRONTEND_CONTAINER_NAME}
+    depends_on:
+      - gateway
+    restart: always
+    env_file:
+      - microservices_defaults/frontend.env
+    environment:
+      - PLACEHOLDER
+    ports:
+      - ${FRONTEND_PORT}:80
+
+  gateway:
+    image: ${GATEWAY_SERVICE_CONTAINER_IMAGE}
+    container_name: ${GATEWAY_SERVICE_CONTAINER_NAME}
+    restart: always
+    env_file:
+      - microservices_defaults/gateway.env
+    environment:
+      - PLACEHOLDER
+    command: >
+      flask 
+        --app gateway/app.py
+        --debug
+        run
+        --host=0.0.0.0
+        --port="${GATEWAY_SERVICE_PORT}"
+    ports:
+      - ${GATEWAY_SERVICE_PORT:?err}:${GATEWAY_SERVICE_PORT}
+
   db:
     image: ${DB_CONTAINER_IMAGE}
     container_name: ${DB_CONTAINER_NAME}
@@ -38,8 +69,9 @@ services:
       - PASSWD_SPECIAL
       - FILE_LOG_DIR
 
+    ## Temporary for development reasons
     ports:
-      - ${DB_CONTROLLER_SERVICE_PORT:?err}:60052
+      - ${DB_CONTROLLER_SERVICE_PORT:?err}:${DB_CONTROLLER_SERVICE_PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -49,6 +81,32 @@ services:
 
     volumes:
       - ./log:${FILE_LOG_DIR:?err}
+
+  ml:
+    image: ${ML_SERVICE_CONTAINER_IMAGE}
+    container_name: ${ML_SERVICE_CONTAINER_NAME}
+    healthcheck:
+      test: [ "CMD", "curl", "http://${ML_SERVICE_HOST}:${ML_SERVICE_PORT}/healthcheck" ]
+      timeout: 20s
+      interval: 60s
+      retries: 5
+      start_period: 20s
+    env_file:
+      - microservices_defaults/ml.env
+    entrypoint: [
+      "waitress-serve",
+      "--host",
+      "${ML_SERVICE_HOST}",
+      "--port",
+      "${ML_SERVICE_PORT}",
+      "--call",
+      "posts_sentiment_analyser:create_app"]
+    environment:
+      - ML_SERVICE_HOST
+      - ML_SERVICE_PORT
+    ## Temporary for development reasons
+    ports:
+      - ${ML_SERVICE_PORT}:${ML_SERVICE_PORT}
 
 volumes:
   posts_analyser_db_volume:
