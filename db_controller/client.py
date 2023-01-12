@@ -7,7 +7,7 @@ def run():
     channel = grpc.insecure_channel("0.0.0.0:60052")
     stub = db_controller_pb2_grpc.PostsAnalyserDbControllerStub(channel)
 
-    username = "user"
+    username = "user1"
     password = "Pass123!"
 
     ## TEST ADDUSER
@@ -21,6 +21,7 @@ def run():
         return
     else:
         print(f"AddUser OK")
+    return
 
     # AddPostEntry
     try:

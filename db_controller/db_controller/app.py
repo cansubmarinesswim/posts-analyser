@@ -5,6 +5,8 @@ from os import getenv
 from pathlib import Path
 
 import grpc
+from py_grpc_prometheus.prometheus_server_interceptor import PromServerInterceptor
+from prometheus_client import start_http_server
 
 from db_controller.proto import db_controller_pb2_grpc
 from db_controller.db_controller_service import DbControllerService
@@ -122,10 +124,14 @@ class Server:
         logger.info(f"Starting db controller service on port {port}...")
         try:
             pass
-            server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
+            server = grpc.server(
+                futures.ThreadPoolExecutor(max_workers=max_workers),
+                interceptors=(PromServerInterceptor(),)
+            )
             db_controller_pb2_grpc.add_PostsAnalyserDbControllerServicer_to_server(
                 DbControllerService(args), server
             )
+            start_http_server(61052)
 
         except Exception as e:
             logger.error(e)

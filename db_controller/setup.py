@@ -126,6 +126,8 @@ setup(
         "psycopg2-binary>=2.9.3, <3.0",
         "sqlalchemy>=1.4, <2.0",
         "password-strength>=0.0.3",
+        "py-grpc-prometheus",
+        "prometheus_client",
     ],
     setup_requires=["wheel", "grpcio-tools>=1.48.0"],
     python_requires=">=3.8",

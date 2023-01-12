@@ -134,6 +134,7 @@ setup(
         "flask",
         "py-healthcheck",
         "requests",
+        "prometheus-client",
     ],
     setup_requires=["wheel", "grpcio-tools>=1.48.0"],
     python_requires=">=3.8",
