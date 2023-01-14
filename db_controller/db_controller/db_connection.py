@@ -61,6 +61,10 @@ class DbConnection:
         self._Session = sessionmaker(bind=self._engine)
         # Initializes db only when db is not initialized
         Base.metadata.create_all(self._engine)
+        try:
+            self.add_user("user1", "Notrelevant123!")
+        except:
+            pass
 
     def validate_user_credentals(self, username, password):
         with self._Session() as session:
