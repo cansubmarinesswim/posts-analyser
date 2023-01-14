@@ -17,4 +17,6 @@ RUN npm run build
 FROM nginx:1.17.10
 COPY --from=build /app/build /etc/nginx/html
 COPY ./deploy/nginx.conf /etc/nginx/nginx.conf
+COPY ./deploy/certs/localhost.crt /etc/ssl/localhost.crt
+COPY ./deploy/certs/localhost.key /etc/ssl/localhost.key
 CMD ["nginx", "-g", "daemon off;"]
