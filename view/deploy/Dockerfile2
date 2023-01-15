@@ -1,4 +1,0 @@
-FROM mstopa/pa-front:test
-COPY nginx2.conf /etc/nginx/nginx.conf
-COPY ./certs/localhost.crt /etc/ssl/localhost.crt
-COPY ./certs/localhost.key /etc/ssl/localhost.key
