@@ -4,6 +4,7 @@ React frontend application.
 ## Run locally
 ### Prerequisites
 - node ~v17.0.1 (npm ~v8.1.0)
+- ClientID for registered Google auth application
 
 ### Settings
 Set backend API address in `package.json`, for example:
@@ -15,6 +16,7 @@ Set backend API address in `package.json`, for example:
 
 ### Development
 ```bash
+export REACT_APP_GOOGLE_CLIENT_ID=<CLIENTID>
 npm start
 ```
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
@@ -46,6 +48,7 @@ docker run \
     -it \
     --rm \
     -p 3000:3000 \
+    -e REACT_APP_GOOGLE_CLIENT_ID=<CLIENTID> \
     pa-front-dev:latest
 ```
 Open http://localhost:3000 to view it in your browser.  
@@ -53,16 +56,14 @@ Open http://localhost:3000 to view it in your browser.
 
 ### Production
 **Build**
+Register Google Auth application at https://console.developers.google.com/apis/credentials
 ```bash
-docker build -f deploy/Dockerfile --no-cache -t pa-front:latest .
+export REACT_APP_GOOGLE_CLIENT_ID=<CLIENT_ID>
+```
+
+```bash
+docker build --build-arg REACT_APP_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID} -f deploy/Dockerfile --no-cache -t pa-front:latest .
 ```
 
 **Run**
-```bash
-docker run \
-    -it \
-    --rm \
-    -p 1337:80 \
-    pa-front:latest
-```
-Open http://localhost:1337 to view it in your browser.
+Run docker compose from `<project_root>/deploy`.
