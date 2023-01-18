@@ -124,6 +124,7 @@ setup(
         "torch",
         "transformers",
         "waitress",
+        "prometheus-client",
     ],
     setup_requires=[
         "requests",

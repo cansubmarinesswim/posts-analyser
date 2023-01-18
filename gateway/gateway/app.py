@@ -2,15 +2,17 @@ from flask import Flask, jsonify, request
 from healthcheck import HealthCheck
 from gateway.ml_connector import MlConnector, MlConnectorError
 from gateway.db_controller_connector import DbConnector, DbConnectorError
+from prometheus_client import Counter, generate_latest
 
 app = Flask(__name__)
 
 ml_connector = MlConnector(host="ml", port="60053")
 db_connector = DbConnector(host="db_controller_service", port="60052")
 
-# ml_connector = MlConnector(host="0.0.0.0", port="60053")
-# db_connector = DbConnector(host="0.0.0.0", port="60052")
-
+fetched_posts_counter = Counter("fetched_posts", "How many times db has been queried for posts")
+created_posts_counter = Counter("created_posts", "How many posts have been created")
+deleted_posts_counter = Counter("deleted_posts", "How many posts been deleted")
+failed_requests = Counter("failed_requests", "How many requests raised exception")
 
 health = HealthCheck()
 
@@ -29,8 +31,13 @@ health.add_check(classify_works)
 def healthcheck():
     return health.run()
 
+@app.route('/metrics')
+def metrics():
+    return generate_latest()
+
 
 @app.route("/api/post/create", methods=["POST"])
+@failed_requests.count_exceptions()
 def create_post():
     try:
         username = request.form.get("username")
@@ -44,6 +51,7 @@ def create_post():
             content=post_content,
             classification=classification,
         )
+        created_posts_counter.inc()
 
         return jsonify(success=True), 200
     except MlConnectorError as e:
@@ -57,6 +65,7 @@ def create_post():
 
 
 @app.route("/api/post/add_user", methods=["POST"])
+@failed_requests.count_exceptions()
 def add_user():
     try:
         username = request.form.get("username")
@@ -76,9 +85,11 @@ def add_user():
 
 
 @app.route("/api/post/<id>", methods=["DELETE"])
+@failed_requests.count_exceptions()
 def remove_post(id):
     try:
         db_connector.remove_post(int(id))
+        deleted_posts_counter.inc(())
         return jsonify(success=True), 200
     except DbConnectorError as e:
         print("DbConnectorError: ", e.message)
@@ -88,10 +99,11 @@ def remove_post(id):
 
 
 @app.route("/api/posts", methods=["GET"])
+@failed_requests.count_exceptions()
 def read_posts():
     try:
         posts = db_connector.get_posts()
-
+        fetched_posts_counter.inc()
         return jsonify(posts), 200
     except:
         return jsonify("Failed"), 400

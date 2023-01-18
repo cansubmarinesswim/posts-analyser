@@ -1,5 +1,7 @@
 version: '3'
 
+name: posts-analyser
+
 services:
   frontend:
     image: ${FRONTEND_CONTAINER_IMAGE}
@@ -12,7 +14,7 @@ services:
     environment:
       - PLACEHOLDER
     ports:
-      - ${FRONTEND_PORT}:80
+      - ${FRONTEND_PORT}:443
 
   gateway:
     image: ${GATEWAY_SERVICE_CONTAINER_IMAGE}
@@ -49,7 +51,7 @@ services:
       - APP_DB_NAME
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d/
-      - posts_analyser_db_volume:/var/lib/postgresql/data
+      - posts-analyser-db-volume:/var/lib/postgresql/data
 
   db_controller_service:
     image: ${DB_CONTROLLER_SERVICE_CONTAINER_IMAGE}
@@ -72,6 +74,8 @@ services:
     ## Temporary for development reasons
     ports:
       - ${DB_CONTROLLER_SERVICE_PORT:?err}:${DB_CONTROLLER_SERVICE_PORT}
+      - 61052:61052
+    ## TODO
     depends_on:
       db:
         condition: service_healthy
@@ -108,7 +112,85 @@ services:
     ports:
       - ${ML_SERVICE_PORT}:${ML_SERVICE_PORT}
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    user: "0"
+    environment:
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      # automatically configure the loki datasource
+      - ./monitoring/grafana/provisioning/:/etc/grafana/provisioning/
+      - ./monitoring/grafana/dashboard_configs/:/etc/dashboards/
+    restart: unless-stopped
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.45.0     
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    restart: unless-stopped
+    privileged: true
+
+  loki:
+    image: grafana/loki:2.6.1
+    ports:
+      - "3100"
+    volumes:
+      - loki-data:/loki
+
+
+  promtail:
+    image: grafana/promtail:2.6.1
+    volumes:
+      # custom config will read logs from the containers of
+      # this project
+      - ./monitoring/promtail-config.yaml:/etc/promtail/config.yml
+      # to read container labels and logs
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
+
 volumes:
-  posts_analyser_db_volume:
+  posts-analyser-db-volume:
     labels:
       - "Posts Analyser Database Volume"
+    driver: local
+
+  prometheus-data:
+    labels:
+      - "Posts Analyser Prometheus Data Volume"
+    driver: local
+
+  grafana-data:
+    labels:
+      - "Posts Analyser Grafana Data Volume"
+    driver: local
+
+  loki-data:
+    labels:
+      - "Posts Analyser Loki Data Volume"
+    driver: local

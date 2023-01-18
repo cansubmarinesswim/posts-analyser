@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request
 from healthcheck import HealthCheck
 import numpy as np
 from scipy.special import softmax
+from prometheus_client import Counter, generate_latest
 
 import posts_sentiment_analyser.model_utils as model_utils
 
@@ -57,6 +58,12 @@ def classify_works():
 
 health.add_check(classify_works)
 
+failed_requests = Counter("failed_requests", "How many requests raised exception")
+classified_posts = Counter("classified_posts", "How many posts have been classified")
+
+@app.route('/metrics')
+def metrics():
+    return generate_latest()
 
 @app.route("/healthcheck", methods=["GET", "POST"])
 def healthcheck():
@@ -64,10 +71,13 @@ def healthcheck():
 
 
 @app.route("/classify", methods=["POST"])
+@failed_requests.count_exceptions()
 def classify():
     if request.method == "POST":
         text = request.form["text"]
         out = _classify(text)
+        classified_posts.inc()
+
         return jsonify(out)
 
 
